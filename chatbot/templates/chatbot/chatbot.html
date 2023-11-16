@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Problem Troubleshooting</title>
+</head>
+<body>
+    <h1>Car Problem Troubleshooting</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="user_input">Describe the car problem:</label><br>
+        <textarea id="user_input" name="user_input" rows="4" cols="50"></textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    {% if response %}
+        <div>
+            <h3>Bot's Response:</h3>
+            <p>{{ response }}</p>
+        </div>
+    {% endif %}
+</body>
+</html>
