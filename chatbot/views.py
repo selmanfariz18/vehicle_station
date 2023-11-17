@@ -93,16 +93,63 @@ all_data = [
 
 
 
+def get_vector(input_text):
+    """
+    Get an embedding vector for a given input using OpenAI's model.
 
+    Args:
+    - input_text (str): Input text for generating the embedding vector.
+
+    Returns:
+    - list: Embedding vector.
+    """
+    response = openai.Embed.create(
+        model="text-embedding-ada-002",
+        inputs=[input_text],
+    )
+    return response['data'][0]['embedding']
+
+def generate_response(customer_question, all_data):
+    """
+    Generate a response based on the customer's question and provided data.
+
+    Args:
+    - customer_question (str): Customer's question including error code.
+    - all_data (list): List of dictionaries containing error code information.
+
+    Returns:
+    - str: Generated response using OpenAI's model.
+    """
+
+
+    # Sample conversation prompt
+    prompt = """
+    i am a mechanic and i get a car's obd reading as"""+customer_question+"""what the problem and can you give fix solutions?"""
+
+    # Request the model to continue the conversation as MEC (AI Car Mechanic)
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=150,
+    )
+    generated_response = response['choices'][0]['text']
+    print("Generated Response:", generated_response)
+    return generated_response
 
 # Chatbot view integrating PDF serving logic
 def chatbot_view(request):
     if request.method == 'POST':
         obd_code = request.POST.get("obd_code")
-        description = request.POST.get("description")
+        #description = request.POST.get("description")
         details = ''
-        if description:
+        '''if description:
             details = description
+        '''
+        response = generate_response(obd_code, all_data)
+
+        print(response)
+
+
 
     return render(request, 'chatbot/home.html', {'response': None})
 
