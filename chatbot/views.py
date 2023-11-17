@@ -6,7 +6,15 @@ from django.contrib import messages
 from django.urls import reverse
 
 
-openai.api_key = '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'
+openai.api_key = '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'
+key = openai.api_key
+
+
+def root_page(request):
+    return render(request, 'root_page.html')
+
+
+
 # Sample data structure (list of dictionaries)
 all_data = [
     {'code': 'P0101', 'description':	'Mass air flow (MAF) sensor circuit, range or performance problem','fix': ''},
@@ -141,8 +149,22 @@ def generate_response(customer_question, all_data):
 # Chatbot view integrating PDF serving logic
 def chatbot_view(request):
     if request.method == 'POST':
+
+        if key:
+            try:
+                response = openai.Completion.create(
+                    engine="text-davinci-003",
+                    prompt="ping",
+                    max_tokens=50  # Define the max tokens as needed
+                )
+                # Use the response from OpenAI API as needed
+                pass
+            except openai.error.AuthenticationError:
+                messages.error(request, "API invalid.")
+                return HttpResponseRedirect(reverse("home"))
+
+
         obd_code = request.POST.get("obd_code")
-        details = ''
 
         if obd_code == '':
             messages.error(request, "Please select an obd code.")
