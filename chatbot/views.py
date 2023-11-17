@@ -1,83 +1,116 @@
 from django.shortcuts import render
 import openai
 import re
-import PyPDF2
 from django.http import HttpResponse
+
+
+openai.api_key = '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'
+# Sample data structure (list of dictionaries)
+all_data = [
+    {'code': 'P0101', 'description':	'Mass air flow (MAF) sensor circuit, range or performance problem','fix': ''},
+    {'code': 'P0102', 'description':	'Mass air flow (MAF) sensor circuit, low input','fix': '102'},
+    {'code': 'P0103', 'description':	'Mass air flow (MAF) sensor circuit, high input','fix': ''},
+    {'code': 'P0106', 'description':	'Manifold absolute pressure (MAP) sensor circuit, range or performance problem','fix': ''},
+    {'code': 'P0107', 'description':	'Manifold absolute pressure (MAP) sensor circuit, low input','fix': ''},
+    {'code': 'P0108', 'description':	'Manifold absolute pressure (MAP) sensor circuit, high input','fix': ''},
+    {'code': 'P0112', 'description':	'Intake air temperature (IAT) circuit, low input','fix': ''},
+    {'code': 'P0113', 'description':	'Intake air temperature (IAT) circuit, high input','fix': ''},
+    {'code': 'P0117', 'description':	'Engine coolant temperature (ECT) circuit, low input','fix': ''},
+    {'code': 'P0118', 'description':	'Engine coolant temperature (ECT) circuit, high input','fix': ''},
+    {'code': 'P0121', 'description':	'Throttle position sensor (TPS) circuit, range or performance problem','fix': ''},
+    {'code': 'P0122', 'description':	'Throttle position sensor (TPS) circuit, low input','fix': ''},
+    {'code': 'P0123', 'description':	'Throttle position sensor (TPS) circuit, high input','fix': ''},
+    {'code': 'P0125', 'description':	'Insufficient coolant temperature for closed loop fuel control','fix': ''},
+    {'code': 'P0131', 'description':	'Oxygen sensor circuit, low voltage (pre-converter sensor, left bank)','fix': ''},
+    {'code': 'P0132', 'description':	'Oxygen sensor circuit, high voltage (pre-converter sensor, left bank)','fix': ''},
+    {'code': 'P0133', 'description':	'Oxygen sensor circuit, slow response (pre-converter sensor, left bank)','fix': ''},
+    {'code': 'P0134', 'description':	'Oxygen sensor circuit - no activity detected (pre-converter sensor, left bank)','fix': ''},
+    {'code': 'P0135', 'description':	'Oxygen sensor heater circuit malfunction (pre-converter sensor, left bank)','fix': ''},
+    {'code': 'P0137', 'description':	'Oxygen sensor circuit, low voltage (post-converter sensor, left bank)','fix': ''},
+    {'code': 'P0138', 'description':	'Oxygen sensor circuit, high voltage (post-converter sensor, left bank)','fix': ''},
+    {'code': 'P0140', 'description':	'Oxygen sensor circuit - no activity detected (post-converter sensor, left bank)','fix': ''},
+    {'code': 'P0141', 'description':	'Oxygen sensor heater circuit malfunction (post-converter sensor, left bank)','fix': ''},
+    {'code': 'P0143', 'description':	'Oxygen sensor circuit, low voltage (#2 post-converter sensor, left bank)','fix': ''},
+    {'code': 'P0144', 'description':	'Oxygen sensor circuit, high voltage (#2 post-converter sensor, left bank)','fix': ''},
+    {'code': 'P0146', 'description':	'Oxygen sensor circuit - no activity detected (#2 post-converter sensor, left bank)','fix': ''},
+    {'code': 'P0147', 'description':	'Oxygen sensor heater circuit malfunction (#2 post-converter sensor, left bank)','fix': ''},
+    {'code': 'P0151', 'description':	'Oxygen sensor circuit, low voltage (pre-converter sensor, right bank)','fix': ''},
+    {'code': 'P0152', 'description':	'Oxygen sensor circuit, high voltage (pre-converter sensor, right bank)','fix': ''},
+    {'code': 'P0153', 'description':	'Oxygen sensor circuit, slow response (pre-converter sensor, right bank)','fix': ''},
+    {'code': 'P0154', 'description':	'Oxygen sensor circuit - no activity detected (pre-converter sensor, right bank)','fix': ''},
+    {'code': 'P0155', 'description':	'Oxygen sensor heater circuit malfunction (pre-converter sensor, right bank)','fix': ''},
+    {'code': 'P0157', 'description':	'Oxygen sensor circuit, low voltage (post-converter sensor, right bank)','fix': ''},
+    {'code': 'P0158', 'description':	'Oxygen sensor circuit, high voltage (post-converter sensor, right bank)','fix': ''},
+    {'code': 'P0160', 'description':	'Oxygen sensor circuit - no activity detected (post-converter sensor, right bank)','fix': ''},
+    {'code': 'P0161', 'description':	'Oxygen sensor heater circuit malfunction (post-converter sensor, right bank)','fix': ''},
+    {'code': 'P0171', 'description':	'System too lean, left bank','fix': ''},
+    {'code': 'P0172', 'description':	'System too rich, left bank','fix': ''},
+    {'code': 'P0174', 'description':	'System too lean, right bank','fix': ''},
+    {'code': 'P0175', 'description':	'System too rich, right bank','fix': ''},
+    {'code': 'P0300', 'description':	'Engine misfire detected','fix': ''},
+    {'code': 'P0301', 'description':	'Cylinder number 1 misfire detected','fix': ''},
+    {'code': 'P0302', 'description':	'Cylinder number 2 misfire detected','fix': ''},
+    {'code': 'P0303', 'description':	'Cylinder number 3 misfire detected','fix': ''},
+    {'code': 'P0304', 'description':	'Cylinder number 4 misfire detected','fix': ''},
+    {'code': 'P0305', 'description':	'Cylinder number 5 misfire detected','fix': ''},
+    {'code': 'P0306', 'description':	'Cylinder number 6 misfire detected','fix': ''},
+    {'code': 'P0307', 'description':	'Cylinder number 7 misfire detected','fix': ''},
+    {'code': 'P0308', 'description':	'Cylinder number 8 misfire detected','fix': ''},
+    {'code': 'P0325', 'description':	'Knock sensor circuit malfunction','fix': ''},
+    {'code': 'P0327', 'description':	'Knock sensor circuit, low output','fix': ''},
+    {'code': 'P0336', 'description':	'Crankshaft position sensor circuit, range or performance problem','fix': ''},
+    {'code': 'P0337', 'description':	'Crankshaft position sensor, low output','fix': ''},
+    {'code': 'P0338', 'description':	'Crankshaft position sensor, high output','fix': ''},
+    {'code': 'P0339', 'description':	'Crankshaft position sensor, circuit intermittent','fix': ''},
+    {'code': 'P0340', 'description':	'Camshaft position sensor circuit','fix': ''},
+    {'code': 'P0341', 'description':	'Camshaft position sensor circuit, range or performance problem','fix': ''},
+    {'code': 'P0401', 'description':	'Exhaust gas recirculation, insufficient flow detected','fix': ''},
+    {'code': 'P0404', 'description':	'Exhaust gas recirculation circuit, range or performance problem','fix': ''},
+    {'code': 'P0405', 'description':	'Exhaust gas recirculation sensor circuit low','fix': ''},
+    {'code': 'P0410', 'description':	'Secondary air injection system','fix': ''},
+    {'code': 'P0418', 'description':	'Secondary air injection pump relay control circuit','fix': ''},
+    {'code': 'P0420', 'description':	'Catalyst system efficiency below threshold, left bank','fix': ''},
+    {'code': 'P0430', 'description':	'Catalyst system efficiency below threshold, right bank','fix': ''},
+    {'code': 'P0440', 'description':	'Evaporative emission control system malfunction','fix': ''},
+    {'code': 'P0441', 'description':	'Evaporative emission control system, purge control circuit malfunction','fix': ''},
+    {'code': 'P0442', 'description':	'Evaporative emission control system, small leak detected','fix': ''},
+    {'code': 'P0446', 'description':	'Evaporative emission control system, vent system performance','fix': ''},
+    {'code': 'P0452', 'description':	'Evaporative emission control system, pressure sensor low input','fix': ''},
+    {'code': 'P0453', 'description':	'Evaporative emission control system, pressure sensor high input','fix': ''},
+    {'code': 'P0461', 'description':	'Fuel level sensor circuit, range or performance problem','fix': ''},
+    {'code': 'P0462', 'description':	'Fuel level sensor circuit, low input','fix': ''},
+    {'code': 'P0463', 'description':	'Fuel level sensor circuit, high input','fix': ''},
+    {'code': 'P0500', 'description':	'Vehicle speed sensor circuit','fix': ''},
+    {'code': 'P0506', 'description':	'Idle control system, rpm lower than expected','fix': ''},
+    {'code': 'P0507', 'description':	'Idle control system, rpm higher than expected','fix': ''},
+    {'code': 'P0601', 'description':	'Powertrain Control Module, memory error','fix': ''},
+    {'code': 'P0602', 'description':	'Powertrain Control module, programming error','fix': ''},
+    {'code': 'P0603', 'description':	'Powertrain Control Module, memory reset error','fix': ''},
+    {'code': 'P0604', 'description':	'Powertrain Control Module, memory error (RAM)','fix': ''},
+    {'code': 'P0605', 'description':	'Powertrain Control Module, memory error (ROM)','fix': ''},
+    # Add more data points as needed
+]
+
+
+
+
 
 # Chatbot view integrating PDF serving logic
 def chatbot_view(request):
     if request.method == 'POST':
-        user_input = request.POST.get('user_input')
-
-        openai.api_key = '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'
-
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt="You are troubleshooting a car problem.\nUser: " + user_input,
-            max_tokens=50  # Adjust max_tokens as needed
-        )
-
-        bot_response = response['choices'][0]['text']
-
-        # Extract keywords related to problem number from user input
-        user_keywords = re.findall(r'problem (\d+)', user_input, re.IGNORECASE)
-
-        # Use keywords to find matching problem number in bot's response
-        matching_number = None
-        for keyword in user_keywords:
-            if keyword in bot_response.lower():
-                matching_number = keyword
-                break
-        pdf_file = 'car_manual.pdf'
-        page_number = find_keyword_page(pdf_file, matching_number)
-        # If no problem number is found in the bot's response, continue with default behavior or prompt for clarification
-        serve_pdf_page(request, page_number)
+        obd_code = request.POST.get("obd_code")
+        description = request.POST.get("description")
+        details = ''
+        if description:
+            details = description
 
     return render(request, 'chatbot/chatbot.html', {'response': None})
 
 
 
-def serve_pdf_page(request, problem_number):
-    pdf_file = 'car_manual.pdf'  # Replace with your PDF file
-
-    if problem_number is None:
-        return HttpResponse("Page not found")  # Return a message if problem_number is None
-
-    # Open the PDF file
-    with open(pdf_file, 'rb') as file:
-        pdf_reader = PyPDF2.PdfReader(file)
-        total_pages = len(pdf_reader.pages)
-
-        if problem_number <= total_pages:
-            page = pdf_reader.pages[problem_number - 1]
-            output = PyPDF2.PdfWriter()
-            output.add_page(page)
-
-            # Serve the extracted page as a response
-            response = HttpResponse(content_type='application/pdf')
-            output.write(response)
-            return response
-
-    return HttpResponse("Page not found")
 
 
 
 
 
-def find_keyword_page(pdf_path, keyword):
-    if keyword is None:
-        return None  # Return None if the keyword is None
 
-    with open(pdf_path, 'rb') as pdf_file:
-        pdf_reader = PyPDF2.PdfReader(pdf_file)
-
-        # Iterate through each page in the PDF
-        for page_num in range(len(pdf_reader.pages)):
-            page = pdf_reader.pages[page_num]
-            text = page.extract_text().lower()
-
-            # Search for the keyword in the text content of the page
-            if keyword.lower() in text:
-                return page_num + 1
-
-    return None
