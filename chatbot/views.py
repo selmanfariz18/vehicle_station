@@ -1,9 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 import openai
 import re
 from django.http import HttpResponse,HttpResponseRedirect
 from django.contrib import messages
 from django.urls import reverse
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth import login as auth_login
+
 
 
 openai.api_key = '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'
@@ -101,8 +105,6 @@ all_data = [
     # Add more data points as needed
 ]
 
-
-
 def get_vector(input_text):
     """
     Get an embedding vector for a given input using OpenAI's model.
@@ -188,8 +190,53 @@ def chatbot_view(request):
     return render(request, 'home.html', context)
 
 
+def login(request):
+    if request.method == 'POST':
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(
+            request=request, username=username, password=password)
+        if user is not None:
+            if user.is_superuser:
+                messages.error(request, "Error in login")
+                return render(request, 'login.html')
+            else:
+                auth_login(request, user)
+                return HttpResponseRedirect(reverse("home"))
+        else:
+            messages.error(request, "Error in login")
+            return render(request, 'login.html')
+    return render(request, 'login.html')
 
 
+def register(request):
+
+    if request.method == 'POST':
+        # get form data
+        username = request.POST['username']
+        email=request.POST['email']
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+
+
+
+        if password == confirm_password:
+            if User.objects.filter(username=username).exists():
+                messages.info(request, 'Username is already taken')
+                return redirect('register')
+            else:
+                # create user and profile objects
+                user = User.objects.create_user(
+                    username=username, password=password,email=email)
+                user.save()
+                messages.success(request, 'Account created successfully.')
+                return render(request, 'login.html')
+
+        else:
+            messages.info(request, 'Both passwords are not matching')
+            return redirect('register')
+
+    return render(request, 'register.html')
 
 
 
