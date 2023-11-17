@@ -104,7 +104,7 @@ def chatbot_view(request):
         if description:
             details = description
 
-    return render(request, 'chatbot/chatbot.html', {'response': None})
+    return render(request, 'chatbot/home.html', {'response': None})
 
 
 
