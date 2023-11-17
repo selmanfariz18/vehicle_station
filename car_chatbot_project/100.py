@@ -1,6 +1,6 @@
 import openai
 import re
-openai.api_key = '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'
+openai.api_key = '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'
 # Sample data structure (list of dictionaries)
 all_data = [
     {'code': 'P0101', 'description':	'Mass air flow (MAF) sensor circuit, range or performance problem','fix': ''},
@@ -101,24 +101,13 @@ def get_vector(input_text):
     )
     return response['data'][0]['embedding']
 
+
+customer_question = "Code:P0161"
+
 # Sample conversation prompt
 prompt = """
-You are MEC, a professional car mechanic. Have a conversation with the customer and answer to the best of your knowledge and using information from the CONTEXT which is a technical summary of the customer’s issue.
+i am a mechanic and i get a car's obd reading as"""+customer_question+"""what the problem and can you give fix solutions?"""
 
-Use context without mentioning it. Customer needs a non-technical summary of the issue and advice. If the issue needs investigation remember that you can help as you are a professional car mechanic.
-
-Also respond to non-car related queries from the customer and give general advice or answer to the best of your knowledge like an understanding friend.
-
-CONTEXT: Code: {'code': 'p0524', 'description': 'Name: {'code': 'P0524', 'description': 'Engine Oil Pressure Too Low Explanation: The vehicle’s main computer called the Powertrain Control Module (PCM) is in control of many sensors, controls, and electronics in the vehicle. In some vehicles, that oil pressure value is then relayed to a gauge in the instrument cluster to show the driver the oil pressure, other times that gauge is not there but there will be a warning light if there is a problem …
-
-CUSTOMER: So I have the oil pressure warning light on and I can hear weird noises from the engine. Can this all be normal?
-
-MEC: Hi there. I had a few things in mind that could be causing the oil pressure warning light to come on and the abnormal engine noise...
-
-CUSTOMER: Is there anything I can do to verify the issue and check something?
-
-MEC: Yes, the first thing you should do is check the oil level and condition...
-"""
 
 # Request the model to continue the conversation as MEC (AI Car Mechanic)
 response = openai.Completion.create(
@@ -127,7 +116,9 @@ response = openai.Completion.create(
     max_tokens=150,
 )
 generated_response = response['choices'][0]['text']
-customer_question = " Code:P0410 So I have the oil pressure warning light on and I can hear weird noises from the engine. Can this all be normal?"
+
+
+
 
 if "Code:" in customer_question:
     code_position = customer_question.find("Code:")
