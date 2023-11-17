@@ -10,7 +10,7 @@ from django.contrib.auth import login as auth_login
 
 
 
-openai.api_key = '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'
+openai.api_key = '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'
 key = openai.api_key
 
 
@@ -208,6 +208,11 @@ def login(request):
             return render(request, 'login.html')
     return render(request, 'login.html')
 
+
+def logout_user(request):
+    logout(request)
+    messages.success(request, "Logout Successfull!")
+    return render(request, 'root_page.html')
 
 def register(request):
 
