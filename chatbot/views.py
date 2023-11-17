@@ -33,7 +33,7 @@ def chatbot_view(request):
         # If no problem number is found in the bot's response, continue with default behavior or prompt for clarification
         serve_pdf_page(request, page_number)
 
-    return render(request, 'chatbot/chatbot.html', {'response': None})
+    return render(request, 'chatbot/home.html', {'response': None})
 
 
 
