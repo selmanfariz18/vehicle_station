@@ -4,7 +4,7 @@ import re
 from django.http import HttpResponse
 
 
-openai.api_key = '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'
+openai.api_key = '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'
 # Sample data structure (list of dictionaries)
 all_data = [
     {'code': 'P0101', 'description':	'Mass air flow (MAF) sensor circuit, range or performance problem','fix': ''},
@@ -140,6 +140,7 @@ def generate_response(customer_question, all_data):
 def chatbot_view(request):
     if request.method == 'POST':
         obd_code = request.POST.get("obd_code")
+        print(obd_code)
         #description = request.POST.get("description")
         details = ''
         '''if description:

@@ -1,12 +1,37 @@
 {% extends 'main.html' %}
+{% load static %}
 {% block content %}
+<head>
+
+</head>
+<style>
+.fliterandboxdiv{
+  display: flex;
+  align-items: center;
+}
+
+.boxdiv{
+  margin-left: 20px;
+}
+</style>
 <body>
-  <form method="post">
-      {% csrf_token %}
-      <label for="user_input">Describe the car problem:</label><br>
-      <textarea id="user_input" name="user_input" rows="4" cols="50"></textarea><br><br>
-      <input type="submit" value="Submit">
-  </form>
+  <div class="fliterandboxdiv">
+      <div class="boxdiv"> <!-- Adjust the margin as needed -->
+          <form method="post">
+              {% csrf_token %}
+              <div class="fliterdiv">
+                <select name="obd_code" id="cat-input">
+                    <option value="">Select filter by</option>
+                    <option value="P011">P011</option>
+                    <option value="P011">P011</option>
+                </select>
+              </div>
+              <label for="user_input">Describe the car problem:</label><br>
+              <textarea id="user_input" name="user_input" rows="4" cols="50"></textarea><br><br>
+              <input type="submit" value="Submit">
+          </form>
+      </div>
+  </div>
 
   {% if response %}
       <div>
