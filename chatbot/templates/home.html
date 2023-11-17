@@ -8,29 +8,27 @@
 
 </style>
 <body>
-  <div class="row" style="text-align:center;">
+
+  <h1 style="text-align:center; padding-top:40px;">Vehicle Station</h1>
+  <h5 style="text-align:center;">For Car enthusiast and mechanics</h5>
+  <h6 style="text-align:center;">We are making your job easier</h6>
+  <div class="row" style="text-align:center; padding-top:60px;">
       <div class="col" > <!-- Adjust the margin as needed -->
-          <form method="post">
+          <form method="post" action="home">
               {% csrf_token %}
               <div class="fliterdiv">
                 <select name="obd_code" class="form-group col-md-4">
                     <option value="">Select filter by</option>
-                    <option value="P011">P011</option>
-                    <option value="P011">P011</option>
+                    {% for i in obd_codes %}
+                    <option value="{{ i.code }}">{{i.code}},{{i.description}}</option>
+                    {% endfor %}
                 </select>
               </div>
-              <label for="user_input">Describe the car problem:</label><br>
-              <textarea id="user_input" name="user_input" rows="2" cols="50"></textarea><br><br>
-              <input type="submit" value="Submit">
+              <!--<label for="user_input">Describe the car problem:</label><br>
+              <textarea id="user_input" name="user_input" rows="2" cols="50"></textarea>--><br><br>
+              <input class="btn-primary" type="submit" value="Submit">
           </form>
       </div>
   </div>
-
-  {% if response %}
-      <div>
-          <h3>Bot's Response:</h3>
-          <p>{{ response }}</p>
-      </div>
-  {% endif %}
 </body>
 {% endblock %}

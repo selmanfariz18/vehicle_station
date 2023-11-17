@@ -1,10 +1,12 @@
 from django.shortcuts import render
 import openai
 import re
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
+from django.contrib import messages
+from django.urls import reverse
 
 
-openai.api_key = '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'
+openai.api_key = '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'
 # Sample data structure (list of dictionaries)
 all_data = [
     {'code': 'P0101', 'description':	'Mass air flow (MAF) sensor circuit, range or performance problem','fix': ''},
@@ -140,19 +142,28 @@ def generate_response(customer_question, all_data):
 def chatbot_view(request):
     if request.method == 'POST':
         obd_code = request.POST.get("obd_code")
-        print(obd_code)
-        #description = request.POST.get("description")
         details = ''
-        '''if description:
-            details = description
-        '''
-        response = generate_response(obd_code, all_data)
 
-        print(response)
+        if obd_code == '':
+            messages.error(request, "Please select an obd code.")
+            return HttpResponseRedirect(reverse("home"))
+        else:
 
+            context = {
+                'obd_codes': all_data,
+            }
+            response = generate_response(obd_code, all_data)
 
+            context = {
+                'response': response,
+            }
+            return render(request, 'solution.html', context)
 
-    return render(request, 'home.html', {'response': None})
+    context = {
+        'obd_codes': all_data,
+    }
+
+    return render(request, 'home.html', context)
 
 
 

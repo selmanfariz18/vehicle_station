@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+
+
+{% block style %}
+.con{
+    background-color:#71a1f0;
+    border-radius: 20px;
+    box-shadow: 10px 10px 5px lightblue;
+}
+
+{% endblock %}
+{% block content %}
+<section>
+<!---->
+    <div class="container con">
+        <p>{{response}}</P>
+    </div>
+</section>
+{% endblock %}
