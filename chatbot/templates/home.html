@@ -56,16 +56,24 @@
               {% csrf_token %}
               <div class="fliterdiv">
                 <select name="obd_code" class="form-group col-md-4">
-                    <option value="">Select filter by</option>
+                    <option value="">Select Error Code</option>
                     {% for i in obd_codes %}
                     <option value="{{ i.code }}">{{i.code}},{{i.description}}</option>
                     {% endfor %}
                 </select>
               </div>
-              <!--<label for="user_input">Describe the car problem:</label><br>
+              <!--<form="user_input">Describe the car problem:</form=><br>
               <textarea id="user_input" name="user_input" rows="2" cols="50"></textarea>--><br><br>
               <input class="btn-primary" type="submit" value="Submit">
           </form>
+      </div>
+      <div>
+        <form method="post" action="submit">
+          {% csrf_token %}
+          <label for="user_input">Dont know the error code,Describe the car problem:</label><br>
+          <textarea id="user_input" name="user_input" rows="4" cols="50"></textarea><br><br>
+          <input type="submit" value="Submit">
+      </form>
       </div>
   </div>
 
