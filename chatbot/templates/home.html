@@ -50,31 +50,57 @@
   <h1 style="text-align:center; padding-top:40px;">Vehicle Station</h1>
   <h5 style="text-align:center;">For Car enthusiast and mechanics</h5>
   <h6 style="text-align:center;">We are making your job easier</h6>
-  <div class="row" style="text-align:center; padding-top:60px;">
-      <div class="col" > <!-- Adjust the margin as needed -->
-          <form method="post" action="home">
-              {% csrf_token %}
-              <div class="fliterdiv">
-                <select name="obd_code" class="form-group col-md-4">
-                    <option value="">Select Error Code</option>
-                    {% for i in obd_codes %}
-                    <option value="{{ i.code }}">{{i.code}},{{i.description}}</option>
-                    {% endfor %}
-                </select>
-              </div>
-              <!--<form="user_input">Describe the car problem:</form=><br>
-              <textarea id="user_input" name="user_input" rows="2" cols="50"></textarea>--><br><br>
-              <input class="btn-primary" type="submit" value="Submit">
-          </form>
+
+  <div style="text-align: center; padding-top: 20px;">
+    <input type="radio" id="col1_radio" name="column_select" onclick="toggleColumn('col1')" checked>
+    <label for="col1_radio">With OBD device</label>
+
+    <input type="radio" id="col2_radio" name="column_select" onclick="toggleColumn('col2')">
+    <label for="col2_radio">NO OBD device</label>
+  </div>
+
+
+  <div class="container">
+    <div class="row justify-content-center" style="padding-top: 60px;">
+      <div class="col-6" id="col1">
+        <form method="post" action="home" style="text-align: center;">
+          {% csrf_token %}
+          <div class="form-group">
+            <select name="obd_code" class="form-control" style="width: 200px; margin: 0 auto;">
+              <option value="">Select Error Code</option>
+              {% for i in obd_codes %}
+              <option value="{{ i.code }}">{{ i.code }}, {{ i.description }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <input class="btn btn-primary" type="submit" value="Submit">
+        </form>
       </div>
-      <div>
+      <div class="col-6" id="col2" style="display: none; text-align: center;">
         <form method="post" action="submit">
           {% csrf_token %}
-          <label for="user_input">Dont know the error code,Describe the car problem:</label><br>
+          <label for="user_input">Don't know the error code? Describe the car problem:</label><br>
           <textarea id="user_input" name="user_input" rows="4" cols="50"></textarea><br><br>
-          <input type="submit" value="Submit">
-      </form>
+          <input class="btn btn-primary" type="submit" value="Submit">
+        </form>
       </div>
+    </div>
   </div>
+
+
+  <script>
+    function toggleColumn(column) {
+      const col1 = document.getElementById('col1');
+      const col2 = document.getElementById('col2');
+
+      if (column === 'col1') {
+        col1.style.display = 'block';
+        col2.style.display = 'none';
+      } else {
+        col1.style.display = 'none';
+        col2.style.display = 'block';
+      }
+    }
+  </script>
 
 {% endblock %}

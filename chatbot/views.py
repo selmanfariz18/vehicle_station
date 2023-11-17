@@ -10,7 +10,7 @@ from django.contrib.auth import login as auth_login
 from pyjarowinkler import distance as get_similarity
 
 
-openai.api_key = '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'
+openai.api_key = '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'
 key = openai.api_key
 
 
@@ -18,7 +18,7 @@ def root_page(request):
     return render(request, 'root_page.html')
 
 import ast
-with open('chatbot\DCT7.txt','r') as file:
+with open('chatbot/DCT7.txt','r') as file:
     lines=file.read()
 # Original string representation
 string_representation = lines
@@ -158,17 +158,17 @@ def sub(request):
             def find_most_similar_data(query_text, data_list):
                 # Calculate the similarity scores for each data point
                 similarity_scores = [(data, calculate_similarity(query_text, data['description'])) for data in data_list]
-                
+
                 # Sort the data points based on similarity scores
                 sorted_data = sorted(similarity_scores, key=lambda x: x[1], reverse=True)
-                
+
                 # Return the most similar data
                 return sorted_data[0][0] if sorted_data else None
 
             # Find the most similar data based on the user input
             most_similar_data = find_most_similar_data(user_input, all_data)
 
-            
+
             if most_similar_data:
                 return redirect('solution', odb_code=most_similar_data.get('code'))
             else:
