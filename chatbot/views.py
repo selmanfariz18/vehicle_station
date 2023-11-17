@@ -152,7 +152,7 @@ def chatbot_view(request):
 
 
 
-    return render(request, 'chatbot/home.html', {'response': None})
+    return render(request, 'home.html', {'response': None})
 
 
 
